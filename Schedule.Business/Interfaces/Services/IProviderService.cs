@@ -6,6 +6,7 @@ namespace Schedule.Business.Interfaces.Services
 {
     public interface IProviderService
     {
+        Task<Provider> Add(Provider model);
         Task<IEnumerable<Provider>> Get(string name);
         Task Remove(int id);
         Task Update(Provider provider);

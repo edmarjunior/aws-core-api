@@ -15,6 +15,7 @@ namespace Schedule.Api.Configuration
 
             // services
             services.AddScoped<IProviderService, ProviderService>();
+            services.AddScoped<IQueueService, QueueService>();
 
             // repositories
             services.AddScoped<IProviderRepository, ProviderRepository>();

@@ -6,6 +6,7 @@ namespace Schedule.Api.Dto.Provider
     public class ProviderDto
     {
         public int Id { get; set; }
+        public string Email { get; set; }
         public string Name { get; set; }
         public IEnumerable<Phone> Phones { get; set; }
     }

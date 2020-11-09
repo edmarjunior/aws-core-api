@@ -44,7 +44,13 @@ namespace Schedule.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<ProviderDto>> Add(ProviderDto providerDto)
         {
-            var provider = await _repository.Add(_mapper.Map<Provider>(providerDto));
+            var provider = await _service.Add(_mapper.Map<Provider>(providerDto));
+
+            if (_notification.Any)
+            {
+                return BadRequest(_notification.Messages);
+            }
+
             return Ok(_mapper.Map<ProviderDto>(provider));
         }
 

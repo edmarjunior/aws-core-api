@@ -14,12 +14,35 @@ namespace Schedule.Business.Services
         private readonly IProviderRepository _repository;
         private readonly IPhoneRepository _phoneRepository;
         private readonly Notification _notification;
+        private readonly IQueueService _queueService;
 
-        public ProviderService(IProviderRepository repository, IPhoneRepository phoneRepository, Notification notification)
+        public ProviderService(IProviderRepository repository, IPhoneRepository phoneRepository, Notification notification, IQueueService queueService)
         {
             _repository = repository;
             _phoneRepository = phoneRepository;
             _notification = notification;
+            _queueService = queueService;
+        }
+
+        public async Task<Provider> Add(Provider provider)
+        {
+            var dulicateEmail = (await _repository.Get(x => x.Email.Trim().Equals(provider.Email.Trim()))).Any();
+
+            if (dulicateEmail)
+            {
+                _notification.Add("Email already used");
+                return null;
+            }
+
+            using var transaction = await _repository.BeginTransaction();
+
+            await _repository.Add(provider);
+
+            await SendWelcomeEmail(provider);
+
+            await transaction.CommitAsync();
+
+            return provider;
         }
 
         public async Task<IEnumerable<Provider>> Get(string name)
@@ -71,6 +94,18 @@ namespace Schedule.Business.Services
             await _repository.Update(provider);
 
             await transaction.CommitAsync();
+        }
+    
+        private async Task SendWelcomeEmail(Provider provider)
+        {
+            var message = new
+            {
+                To = provider.Email,
+                Subject = "Welcome to the schedule",
+                Body = $"Hi {provider.Name}, welcome to the schedule"
+            };
+
+            await _queueService.Send(queueName: "SendEmail", message);
         }
     }
 }

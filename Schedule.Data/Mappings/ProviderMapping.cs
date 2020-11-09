@@ -12,7 +12,9 @@ namespace Schedule.Data.Mappings
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Name).HasColumnType("VARCHAR(100)").IsRequired();
+            builder.Property(x => x.Email).HasMaxLength(50).IsRequired();
             builder.HasIndex(x => x.Name).HasName("idx_provider_name");
+            builder.HasAlternateKey(x => x.Email);
 
             //builder
             //    .HasMany(x => x.Phones)
