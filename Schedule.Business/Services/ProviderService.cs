@@ -104,8 +104,8 @@ namespace Schedule.Business.Services
                 Subject = "Welcome to the schedule",
                 Body = $"Hi {provider.Name}, welcome to the schedule"
             };
-
-            await _queueService.Send(queueName: "SendEmail", message);
+            
+            await _queueService.Send(queueName: "SendEmail", message); // this queueu "SendEmail" triggers Functions.SendEmail
         }
     }
 }
