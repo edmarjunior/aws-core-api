@@ -15,6 +15,7 @@ namespace Schedule.Business.Services
         private readonly IPhoneRepository _phoneRepository;
         private readonly Notification _notification;
         private readonly IQueueService _queueService;
+        private readonly IStorageService _storageService;
 
         public ProviderService(IProviderRepository repository, IPhoneRepository phoneRepository, Notification notification, IQueueService queueService)
         {
@@ -22,6 +23,7 @@ namespace Schedule.Business.Services
             _phoneRepository = phoneRepository;
             _notification = notification;
             _queueService = queueService;
+            _storageService = new StorageService("schedule-core");
         }
 
         public async Task<Provider> Add(Provider provider)
@@ -40,6 +42,11 @@ namespace Schedule.Business.Services
 
             await SendWelcomeEmail(provider);
 
+            if (provider.Documents.Any())
+            {
+                await UploadDocuments(provider);
+            }
+
             await transaction.CommitAsync();
 
             return provider;
@@ -50,6 +57,27 @@ namespace Schedule.Business.Services
             return string.IsNullOrEmpty(name)
                 ? await _repository.GetAll()
                 : await _repository.Get(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<Model> GetById(int id)
+        {
+            var provider = await _repository.GetById(id);
+
+            if (provider == null)
+            {
+                _notification.Add("Provider not found");
+                return null;
+            }
+
+            if (provider.Documents?.Any() ?? false)
+            {
+                foreach (var document in provider.Documents)
+                {
+                    document.Url = _storageService.GetUrl($"{document.Id}.pdf");
+                }
+            }
+
+            return provider;
         }
 
         public async Task Remove(int id)
@@ -64,7 +92,7 @@ namespace Schedule.Business.Services
 
             await using var transaction = await _repository.BeginTransaction();
 
-            await _repository.Remove(id);
+            await _repository.Remove(provider);
 
             if (provider.Phones.Any())
             {
@@ -76,11 +104,19 @@ namespace Schedule.Business.Services
 
         public async Task Update(Provider provider)
         {
-            var currentProvider = await _repository.GetById(provider.Id);
+            var currentProvider = await _repository.GetById(provider.Id, false);
 
             if (currentProvider == null)
             {
                 _notification.Add("Provider not found");
+                return;
+            }
+
+            var dulicateEmail = (await _repository.Get(x => x.Id != provider.Id && x.Email.Trim().Equals(provider.Email.Trim()))).Any();
+
+            if (dulicateEmail)
+            {
+                _notification.Add("Email already used");
                 return;
             }
 
@@ -95,7 +131,7 @@ namespace Schedule.Business.Services
 
             await transaction.CommitAsync();
         }
-    
+
         private async Task SendWelcomeEmail(Provider provider)
         {
             var message = new
@@ -104,8 +140,16 @@ namespace Schedule.Business.Services
                 Subject = "Welcome to the schedule",
                 Body = $"Hi {provider.Name}, welcome to the schedule"
             };
-            
+
             await _queueService.Send(queueName: "SendEmail", message); // this queueu "SendEmail" triggers Functions.SendEmail
+        }
+
+        private async Task UploadDocuments(Provider provider)
+        {
+            foreach (var document in provider.Documents)
+            {
+                document.Url = await _storageService.UploadBase64(document.FileBase64, $"{document.Id}.pdf");
+            }
         }
     }
 }

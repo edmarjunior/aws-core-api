@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Schedule.Business.Models;
 
 namespace Schedule.Data
 {
     public class ApplicationContext: DbContext
     {
+        public static readonly ILoggerFactory _logger = LoggerFactory.Create(x => x.AddConsole());
+
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
         }
@@ -15,10 +19,12 @@ namespace Schedule.Data
         public DbSet<Provider> Providers { get; set; }
         public DbSet<User> Users { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(@"Server=localhost\SQLEXPRESS;Database=Schedule;Trusted_Connection=True;");
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .UseLoggerFactory(_logger)
+                .EnableSensitiveDataLogging();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

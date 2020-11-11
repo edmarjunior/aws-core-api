@@ -34,7 +34,12 @@ namespace Schedule.Data.Repositories
 
         public async Task<IEnumerable<Model>> GetAll() => await DbSet.AsNoTracking().ToListAsync();
 
-        public virtual async Task<Model> GetById(int id) => await DbSet.FindAsync(id);
+        public virtual async Task<Model> GetById(int id, bool tracking = true)
+        {
+            return tracking
+                ? await DbSet.FindAsync(id)
+                : await DbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        }
 
         public async Task Remove(int id)
         {
@@ -45,6 +50,12 @@ namespace Schedule.Data.Repositories
         public async Task Remove(IEnumerable<Model> models)
         {
             DbSet.RemoveRange(models);
+            await Db.SaveChangesAsync();
+        }
+
+        public async Task Remove(Model model)
+        {
+            DbSet.Remove(model);
             await Db.SaveChangesAsync();
         }
 

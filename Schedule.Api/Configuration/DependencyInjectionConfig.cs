@@ -14,12 +14,14 @@ namespace Schedule.Api.Configuration
             services.AddScoped<Notification>();
 
             // services
-            services.AddScoped<IProviderService, ProviderService>();
             services.AddScoped<IQueueService, QueueService>();
+            services.AddScoped<IProviderService, ProviderService>();
+            services.AddScoped<IProviderDocumentService, ProviderDocumentService>();
 
             // repositories
             services.AddScoped<IProviderRepository, ProviderRepository>();
             services.AddScoped<IPhoneRepository, PhoneRepository>();
+            services.AddScoped<IProviderDocumentRepository, ProviderDocumentRepository>();
 
             return services;
         }

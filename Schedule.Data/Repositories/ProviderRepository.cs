@@ -12,12 +12,13 @@ namespace Schedule.Data.Repositories
 
         }
 
-        public override async Task<Provider> GetById(int id)
+        public override async Task<Provider> GetById(int id, bool tracking)
         {
             return await DbSet
                 .AsNoTracking()
                 .Include(x => x.Phones)
                 .ThenInclude(x => x.Phone)
+                .Include(x => x.Documents)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }

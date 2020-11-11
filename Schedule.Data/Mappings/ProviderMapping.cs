@@ -14,7 +14,7 @@ namespace Schedule.Data.Mappings
             builder.Property(x => x.Name).HasColumnType("VARCHAR(100)").IsRequired();
             builder.Property(x => x.Email).HasMaxLength(50).IsRequired();
             builder.HasIndex(x => x.Name).HasName("idx_provider_name");
-            builder.HasAlternateKey(x => x.Email);
+            builder.HasIndex(x => x.Email).IsUnique();
 
             //builder
             //    .HasMany(x => x.Phones)

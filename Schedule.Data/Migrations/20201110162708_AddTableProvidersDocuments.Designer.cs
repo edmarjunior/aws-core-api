@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Schedule.Data;
 
 namespace Schedule.Data.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20201110162708_AddTableProvidersDocuments")]
+    partial class AddTableProvidersDocuments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,8 +133,7 @@ namespace Schedule.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
+                    b.HasAlternateKey("Email");
 
                     b.HasIndex("Name")
                         .HasName("idx_provider_name");
@@ -157,7 +158,7 @@ namespace Schedule.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Name", "ProviderId");
+                    b.HasAlternateKey("Name");
 
                     b.HasIndex("ProviderId");
 
@@ -247,7 +248,7 @@ namespace Schedule.Data.Migrations
             modelBuilder.Entity("Schedule.Business.Models.ProviderDocument", b =>
                 {
                     b.HasOne("Schedule.Business.Models.Provider", "Provider")
-                        .WithMany("Documents")
+                        .WithMany()
                         .HasForeignKey("ProviderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

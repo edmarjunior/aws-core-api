@@ -8,5 +8,6 @@ namespace Schedule.Business.Models
         public string Email { get; set; }
         public IEnumerable<Appointment> Appointments { get; set; }
         public IEnumerable<ProviderPhone> Phones { get; set; }
+        public IEnumerable<ProviderDocument> Documents { get; set; }
     }
 }
