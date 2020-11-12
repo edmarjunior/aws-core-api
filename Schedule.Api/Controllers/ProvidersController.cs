@@ -70,7 +70,9 @@ namespace Schedule.Api.Controllers
                 return BadRequest("Id no match");
             }
 
-            await _service.Update(_mapper.Map<Provider>(providerDto));
+            var provider = _mapper.Map<Provider>(providerDto);
+
+            await _service.Update(provider);
 
             if (_notification.Any)
                 return BadRequest(_notification.Messages);
