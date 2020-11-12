@@ -27,7 +27,7 @@ namespace Schedule.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<Provider>> Get(string name)
         {
-            return new List<Provider> { new Provider { Id = 255, Name = "Teste2", Email = "edmar@gmail.com" } };
+            return new List<Provider> { new Provider { Id = 255, Name = "Teste3", Email = "edmar@gmail.com" } };
         }
 
         [HttpGet("{id}")]
