@@ -25,7 +25,10 @@ namespace Schedule.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Provider>> Get(string name) => await _service.Get(name);
+        public async Task<IEnumerable<Provider>> Get(string name)
+        {
+            return new List<Provider> { new Provider { Id = 255, Name = "Teste", Email = "edmar@gmail.com" } };
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProviderResponseDto>> Get(int id)
